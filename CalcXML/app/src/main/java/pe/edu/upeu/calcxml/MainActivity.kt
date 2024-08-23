@@ -41,22 +41,45 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onclikListener(view:View){
+        var butonx=findViewById<Button>(view.id)
         when(view.id){
             R.id.btn9, R.id.btn8, R.id.btn7, R.id.btn6, R.id.btn5, R.id.btn4->{
-                var butonx=findViewById<Button>(view.id)
                 apenddNum(butonx.text.toString())
             }
             R.id.btnSum, R.id.btnMult->{
-
+                operador(butonx.text.toString())
             }
             R.id.btnIgual->{
-
+                funObenerResultado()
             }
         }
     }
 
     fun apenddNum(valor:String){
         resultado.append(valor)
+    }
+
+    fun operador(valor: String){
+        operador=valor
+        valAnt=resultado.text.toString().toDouble()
+        resultado.text.clear()
+    }
+
+    fun funObenerResultado(){
+        valAct=resultado.text.toString().toDouble()
+        val result=when(operador){
+            "+"->valAnt+valAct
+            "*"->valAnt*valAct
+            else->0
+        }
+        resultado.setText(result.toString())
+    }
+
+    fun borrarContenido(){
+        valAnt=0.0
+        valAct=0.0
+        operador=""
+        resultado.text.clear()
     }
 
 
