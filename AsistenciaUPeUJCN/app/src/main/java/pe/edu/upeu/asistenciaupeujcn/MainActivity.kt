@@ -21,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +33,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import dagger.hilt.android.AndroidEntryPoint
 import pe.edu.upeu.asistenciaupeujcn.ui.navigation.Destinations
 import pe.edu.upeu.asistenciaupeujcn.ui.navigation.NavigationHost
@@ -48,14 +51,39 @@ import pe.edu.upeu.asistenciaupeujcn.ui.theme.LightPurpleColors
 import pe.edu.upeu.asistenciaupeujcn.ui.theme.LightRedColors
 import pe.edu.upeu.asistenciaupeujcn.ui.theme.ThemeType
 import pe.edu.upeu.asistenciaupeujcn.utils.TokenUtils
+import pe.edu.upeu.asistenciaupeujcn.utils.isNetworkAvailable
 import pe.edu.upeu.asistenciaupeujcn.utils.isNight
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val otorgarp = rememberMultiplePermissionsState(permissions = listOf(
+                android.Manifest.permission.ACCESS_NETWORK_STATE,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.CAMERA,
+            ))
+            LaunchedEffect(true){
+                if (otorgarp.allPermissionsGranted){
+                    Toast.makeText(this@MainActivity, "Permiso concedido",
+                        Toast.LENGTH_SHORT).show()
+                }else{if (otorgarp.shouldShowRationale){
+                    Toast.makeText(this@MainActivity, "La aplicacion requiereeste permiso",
+                            Toast.LENGTH_SHORT).show()
+                }else{
+                    Toast.makeText(this@MainActivity, "El permiso fue denegado", Toast.LENGTH_SHORT).show()
+                }
+                    otorgarp.launchMultiplePermissionRequest()
+                }
+                Toast.makeText(this@MainActivity,
+                    "Con:${isNetworkAvailable(this@MainActivity)}",Toast.LENGTH_LONG
+                ).show()
+            }
+
             val themeType= remember{ mutableStateOf(ThemeType.RED) }
             val darkThemex= isNight()
             val darkTheme = remember { mutableStateOf(darkThemex) }
@@ -126,7 +154,7 @@ fun MainScreen(
         Destinations.Pantalla3,
         Destinations.Pantalla4,
         Destinations.Pantalla5,
-//Destinations.ActividadUI,
+        Destinations.ActividadUI,
 //Destinations.MaterialesxUI,
 //Destinations.PantallaQR
     )
