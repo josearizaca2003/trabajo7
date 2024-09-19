@@ -87,6 +87,7 @@ class QRViewModel @Inject constructor(
             lastProcessedBarcode = null
         }
     }
+
     @SuppressLint("MissingPermission")
     fun posicionObtencion() {
         var context: Context= TokenUtils.CONTEXTO_APPX
